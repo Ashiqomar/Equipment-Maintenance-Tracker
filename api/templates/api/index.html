@@ -1,0 +1,220 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Maintenance Tracker</title>
+    <link rel="stylesheet" href="{% static 'api/style.css' %}">
+</head>
+<body>
+    <div class="bg-orb orb-one"></div>
+    <div class="bg-orb orb-two"></div>
+    <div class="bg-grid"></div>
+    <div class="page">
+        <header class="hero">
+            <div class="hero-copy">
+                <p class="tag">Equipment Maintenance Dashboard</p>
+                <h1>Equipment Maintenance Tracker</h1>
+                <p class="subtext">
+                    A role-based maintenance workspace for assigning service tasks and tracking completion.
+                </p>
+            </div>
+        </header>
+
+        <main class="top-grid">
+            <section class="card compact-card">
+                <p class="card-kicker">Start Here</p>
+                <h2>Login</h2>
+                <form id="loginForm" class="form-grid">
+                    {% csrf_token %}
+                    <input id="username" type="text" placeholder="Username" required>
+                    <input id="password" type="password" placeholder="Password" required>
+                    <button type="submit">Login</button>
+                </form>
+                <p id="loginMessage" class="message"></p>
+            </section>
+
+            <section class="card compact-card">
+                <p class="card-kicker">Session</p>
+                <h2>Current User</h2>
+                <div id="userBox" class="info-box">
+                    <p>Not logged in</p>
+                </div>
+                <button id="logoutButton" class="secondary-btn hidden" type="button">Logout</button>
+            </section>
+        </main>
+
+        <section id="adminPanel" class="dashboard-section hidden">
+            <div class="section-title">
+                <h2>Admin Panel</h2>
+                <p>Manage equipment, technicians, tasks, status, alerts, and maintenance history here.</p>
+            </div>
+
+            <div class="summary-grid">
+                <section class="card summary-card">
+                    <p class="card-kicker">Summary</p>
+                    <h3>Total Equipment</h3>
+                    <p id="summaryEquipment" class="summary-number">0</p>
+                </section>
+                <section class="card summary-card">
+                    <p class="card-kicker">Summary</p>
+                    <h3>Total Technicians</h3>
+                    <p id="summaryTechnicians" class="summary-number">0</p>
+                </section>
+                <section class="card summary-card">
+                    <p class="card-kicker">Summary</p>
+                    <h3>Pending Tasks</h3>
+                    <p id="summaryPending" class="summary-number">0</p>
+                </section>
+                <section class="card summary-card">
+                    <p class="card-kicker">Summary</p>
+                    <h3>Completed Tasks</h3>
+                    <p id="summaryCompleted" class="summary-number">0</p>
+                </section>
+            </div>
+
+            <div class="panel-grid">
+                <section class="card panel-card">
+                    <div class="panel-block">
+                        <p class="card-kicker">Assets</p>
+                        <h3>Create Equipment</h3>
+                        <form id="equipmentForm" class="form-grid">
+                            <input id="equipmentName" type="text" placeholder="Equipment name" required>
+                            <input id="equipmentType" type="text" placeholder="Equipment type" required>
+                            <input id="lastServiceDate" type="date" required>
+                            <input id="nextServiceDate" type="date" required>
+                            <button type="submit">Save Equipment</button>
+                        </form>
+                        <p id="equipmentMessage" class="message"></p>
+                    </div>
+                </section>
+
+                <section class="card panel-card">
+                    <div class="panel-block">
+                        <p class="card-kicker">People</p>
+                        <h3>Create Technician</h3>
+                        <form id="technicianForm" class="form-grid">
+                            <input id="techUsername" type="text" placeholder="Username" required>
+                            <input id="techEmail" type="email" placeholder="Email" required>
+                            <input id="techPassword" type="password" placeholder="Password" required>
+                            <button type="submit">Create Technician</button>
+                        </form>
+                        <p id="technicianMessage" class="message"></p>
+                    </div>
+                </section>
+
+                <section class="card panel-card">
+                    <div class="panel-block">
+                        <p class="card-kicker">Operations</p>
+                        <h3>Assign Task</h3>
+                        <form id="taskForm" class="form-grid">
+                            <select id="taskTechnicianId" required>
+                                <option value="">Select Technician</option>
+                            </select>
+                            <select id="taskEquipmentId" required>
+                                <option value="">Select Equipment</option>
+                            </select>
+                            <textarea id="taskMessage" placeholder="Task message" required></textarea>
+                            <button type="submit">Assign Task</button>
+                        </form>
+                        <p id="taskMessageBox" class="message"></p>
+                    </div>
+                </section>
+
+                <section class="card panel-card">
+                    <div class="panel-block">
+                        <p class="card-kicker">Directory</p>
+                        <h3>Technician List</h3>
+                        <button id="loadTechniciansButton" class="secondary-btn">Load Technicians</button>
+                        <div id="technicianList" class="list-box"></div>
+                    </div>
+                </section>
+
+                <section class="card panel-card">
+                    <div class="panel-block">
+                        <p class="card-kicker">Tracking</p>
+                        <h3>All Status</h3>
+                        <div class="filter-row">
+                            <input id="statusSearchInput" type="text" placeholder="Search technician, equipment, or message">
+                            <select id="statusFilterSelect">
+                                <option value="">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                        <button id="loadAdminNotificationsButton" class="secondary-btn">Load Status</button>
+                        <div id="adminNotificationList" class="list-box"></div>
+                    </div>
+                </section>
+
+                <section class="card panel-card">
+                    <div class="panel-block">
+                        <p class="card-kicker">Inventory</p>
+                        <h3>Equipment List</h3>
+                        <button id="loadEquipmentButton" class="secondary-btn">Load Equipment</button>
+                        <div id="equipmentList" class="list-box"></div>
+                    </div>
+                </section>
+
+                <section class="card panel-card">
+                    <div class="panel-block">
+                        <p class="card-kicker">Alerts</p>
+                        <h3>Due Soon</h3>
+                        <button id="loadAlertsButton" class="secondary-btn">Load Alerts</button>
+                        <div id="alertsList" class="list-box"></div>
+                    </div>
+                </section>
+
+                <section class="card panel-card">
+                    <div class="panel-block">
+                        <p class="card-kicker">History</p>
+                        <h3>Maintenance History</h3>
+                        <div class="form-grid">
+                            <select id="historyEquipmentId">
+                                <option value="">Select Equipment</option>
+                            </select>
+                            <button id="loadHistoryButton" class="secondary-btn" type="button">Load History</button>
+                        </div>
+                        <div id="historyList" class="list-box"></div>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <section id="technicianPanel" class="dashboard-section hidden">
+            <div class="section-title">
+                <h2>Technician Panel</h2>
+                <p>View assigned work and submit completed maintenance.</p>
+            </div>
+
+            <div class="panel-grid technician-grid">
+                <section class="card panel-card">
+                    <div class="panel-block">
+                        <p class="card-kicker">Assigned Work</p>
+                        <h3>My Tasks</h3>
+                        <button id="loadTasksButton" class="secondary-btn">Load My Tasks</button>
+                        <div id="taskList" class="list-box"></div>
+                    </div>
+                </section>
+
+                <section class="card panel-card">
+                    <div class="panel-block">
+                        <p class="card-kicker">Submission</p>
+                        <h3>Complete Task</h3>
+                        <form id="completeTaskForm" class="form-grid">
+                            <input id="completeTaskId" type="number" placeholder="Notification ID" required>
+                            <input id="completeServiceDate" type="date" required>
+                            <textarea id="completeNotes" placeholder="Maintenance notes"></textarea>
+                            <button type="submit">Complete Task</button>
+                        </form>
+                        <p id="completeTaskMessage" class="message"></p>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </div>
+
+    <script src="{% static 'api/script.js' %}"></script>
+</body>
+</html>
